@@ -7,21 +7,34 @@ import (
 	"log"
 	"time"
 
+	"github.com/google/gousb"
+	"github.com/pkg/errors"
 	"github.com/rigado/ble"
 	"github.com/rigado/ble/examples/lib/dev"
-	"github.com/pkg/errors"
 )
 
 var (
-	device = flag.String("device", "default", "implementation of ble")
-	du     = flag.Duration("du", 5*time.Second, "scanning duration")
-	dup    = flag.Bool("dup", true, "allow duplicate reported")
+	du  = flag.Duration("du", 5*time.Second, "scanning duration")
+	dup = flag.Bool("dup", true, "allow duplicate reported")
 )
+
+// CONFIG_USB_DEVICE_VID=0x2FE3
+// CONFIG_USB_PID_BLE_HCI_H4_SAMPLE=0x000C
+const usbVendorId uint16 = 0x2fe3
+const usbProductId uint16 = 0x000c
 
 func main() {
 	flag.Parse()
 
-	d, err := dev.NewDevice(*device)
+	// Only one context should be needed for an application.  It should always be closed.
+	ctx := gousb.NewContext()
+	defer ctx.Close()
+
+	//ctx.Debug(3)
+
+	opt := ble.OptTransportH4Usb(ctx, usbVendorId, usbProductId)
+
+	d, err := dev.NewDevice("", opt)
 	if err != nil {
 		log.Fatalf("can't new device : %s", err)
 	}
@@ -29,8 +42,8 @@ func main() {
 
 	// Scan for specified durantion, or until interrupted by user.
 	fmt.Printf("Scanning for %s...\n", *du)
-	ctx := ble.WithSigHandler(context.WithTimeout(context.Background(), *du))
-	chkErr(ble.Scan(ctx, *dup, advHandler, nil))
+	bgCtx := ble.WithSigHandler(context.WithTimeout(context.Background(), *du))
+	chkErr(ble.Scan(bgCtx, *dup, advHandler, nil))
 }
 
 func advHandler(a ble.Advertisement) {

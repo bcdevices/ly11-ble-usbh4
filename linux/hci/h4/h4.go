@@ -54,14 +54,14 @@ func NewSerial(opts serial.OpenOptions) (io.ReadWriteCloser, error) {
 	logrus.Debugf("opening h4 uart %v...", opts.PortName)
 	rwc, err := serial.Open(opts)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "open")
 	}
 
 	// eof is ok (read timeout)
 	eofAsError := false
 	if err := resetAndWaitIdle(rwc, time.Second*2, eofAsError); err != nil {
 		rwc.Close()
-		return nil, err
+		return nil, errors.Wrap(err, "resetAndWaitIdle")
 	}
 	logrus.Debugf("opened %v", opts)
 

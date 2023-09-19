@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/aead/cmac v0.0.0-20160719120800-7af84192f0b1
+	github.com/google/gousb v1.1.2
 	github.com/jacobsa/go-serial v0.0.0-20180131005756-15cf729a72d4
 	github.com/json-iterator/go v1.1.9
 	github.com/pkg/errors v0.8.1
