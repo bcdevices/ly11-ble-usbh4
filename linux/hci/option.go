@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/gousb"
+
 	"github.com/rigado/ble/cache"
 
 	"github.com/rigado/ble/linux/hci/cmd"
@@ -96,6 +98,14 @@ func (h *HCI) SetTransportH4Socket(addr string, timeout time.Duration) error {
 func (h *HCI) SetTransportH4Uart(path string, baud int) error {
 	h.transport = transport{
 		h4uart: &transportH4Uart{path, baud},
+	}
+	return nil
+}
+
+// SetTransportH4Usb sets h4 USB options
+func (h *HCI) SetTransportH4Usb(ctx *gousb.Context, vendorId, productId uint16) error {
+	h.transport = transport{
+		h4usb: &transportH4Usb{ctx, vendorId, productId},
 	}
 	return nil
 }

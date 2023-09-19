@@ -43,7 +43,7 @@ func TestAdvDecode(t *testing.T) {
 		197 (rssi)
 	*/
 	bad := evt.LEAdvertisingReport{2, 1, 0, 0, 45, 58, 130, 157, 134, 122, 29, 2, 1, 6, 2, 5, 9, 67, 97, 115, 99, 97, 100, 101, 45, 67, 48, 51, 49, 48, 54, 49, 56, 51, 52, 45, 48, 48, 49, 57, 49, 197}
-	a, err := newAdvertisement(bad, 0)
+	a, err := newAdvertisement(bad, 1)
 	t.Log(a, err)
 	if err == nil {
 		t.Fatal("no error on malformed payload")

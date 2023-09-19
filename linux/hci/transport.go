@@ -5,6 +5,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/google/gousb"
+
 	"github.com/rigado/ble/linux/hci/h4"
 	"github.com/rigado/ble/linux/hci/socket"
 )
@@ -23,9 +25,16 @@ type transportH4Uart struct {
 	baud int
 }
 
+type transportH4Usb struct {
+	ctx       *gousb.Context
+	vendorId  uint16
+	productId uint16
+}
+
 type transport struct {
 	hci      *transportHci
 	h4uart   *transportH4Uart
+	h4usb    *transportH4Usb
 	h4socket *transportH4Socket
 }
 
@@ -44,6 +53,9 @@ func getTransport(t transport) (io.ReadWriteCloser, error) {
 			so.BaudRate = uint(t.h4uart.baud)
 		}
 		return h4.NewSerial(so)
+
+	case t.h4usb != nil:
+		return h4.NewUsb(t.h4usb.ctx, t.h4usb.vendorId, t.h4usb.productId)
 
 	default:
 		return nil, fmt.Errorf("no valid transport found")
